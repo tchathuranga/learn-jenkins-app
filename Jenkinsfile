@@ -2,24 +2,24 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                } 
-            }
-            steps {
-                sh '''
-                    ls -la
-                    node --version
-                    npm --version
-                    npm ci
-                    npm run build
-                    ls -la
-                '''
-            }
-        }
+        // stage('Build') {
+        //     agent {
+        //         docker {
+        //             image 'node:18-alpine'
+        //             reuseNode true
+        //         } 
+        //     }
+        //     steps {
+        //         sh '''
+        //             ls -la
+        //             node --version
+        //             npm --version
+        //             npm ci
+        //             npm run build
+        //             ls -la
+        //         '''
+        //     }
+        // }
         
         stage('Test') {
             agent {
@@ -42,13 +42,16 @@ pipeline {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.58.2-noble' //Playwright image with Node 18  
                     reuseNode true
+                    // args '-u root:root' // Run as root to avoid permission issues with Playwright
                 } 
             }
             
             steps {
                 sh '''
-                    npm install -g serve
-                    serve -s build
+                    #npm install -g serve
+                    npm install serve
+                    #serve -s build
+                    node_modules/.bin/serve -s build
                     npx playwright test
                 '''
             }
