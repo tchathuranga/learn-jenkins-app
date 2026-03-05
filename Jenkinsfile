@@ -2,24 +2,24 @@ pipeline {
     agent any
 
     stages {
-        // stage('Build') {
-        //     agent {
-        //         docker {
-        //             image 'node:18-alpine'
-        //             reuseNode true
-        //         } 
-        //     }
-        //     steps {
-        //         sh '''
-        //             ls -la
-        //             node --version
-        //             npm --version
-        //             npm ci
-        //             npm run build
-        //             ls -la
-        //         '''
-        //     }
-        // }
+        stage('Build') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                } 
+            }
+            steps {
+                sh '''
+                    ls -la
+                    node --version
+                    npm --version
+                    npm ci
+                    npm run build
+                    ls -la
+                '''
+            }
+        }
         
         stage('Test') {
             agent {
@@ -51,8 +51,9 @@ pipeline {
                     #npm install -g serve
                     npm install serve
                     #serve -s build
-                    node_modules/.bin/serve -s build
-                    npx playwright test
+                    node_modules/.bin/serve -s build & 
+                    sleep 10 #Wait for the server to start
+                    npx playwright test 
                 '''
             }
         }
@@ -60,7 +61,7 @@ pipeline {
 
     post {
         always {
-            junit 'test-results/junit.xml'
+            junit 'jest-results/junit.xml'
         }
     }
 }
